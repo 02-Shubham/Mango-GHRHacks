@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter);
+  --color-brand-primary: #2563EB;
+  /* Government Blue */
+  --color-brand-secondary: #1E40AF;
+  /* Darker Blue */
+  --color-brand-accent: #16A34A;
+  /* Success Green */
+  --color-bg-page: #F8FAFC;
+  /* Clean Slate Background */
+  --color-text-main: #0F172A;
+  /* Deep Slate Text */
+  --color-text-muted: #64748B;
+  /* Gray-ish Text */
+  --color-border-subtle: #E2E8F0;
+  /* Light Borders */
+  --color-sidebar-bg: #FFFFFF;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-bg-page);
+    color: var(--color-text-main);
+    @apply antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+@layer utilities {
+  .glow-blur {
+    filter: blur(120px);
+    opacity: 0.3;
+  }
+
+  .glow-blur-sm {
+    filter: blur(40px);
+    opacity: 0.2;
+  }
+
+  .glass-card {
+    @apply bg-white border border-border-subtle rounded-3xl shadow-sm hover:shadow-md transition-all duration-300;
+  }
+
+  .document-card {
+    @apply bg-white border border-border-subtle rounded-2xl shadow-sm hover:shadow-md transition-all duration-300;
+  }
+
+  .teal-gradient {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, transparent 100%);
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-all;
+  }
+}
