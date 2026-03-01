@@ -8,8 +8,9 @@ NyayaSetu is a state-of-the-art decentralized ecosystem built to empower citizen
 
 ## 🛡️ Core Pillars of Security
 
-### ⛓️ Blockchain-Native Integrity
-Every complaint and report is anchored on an immutable blockchain ledger. Once submitted, evidence cannot be tampered with, deleted, or hidden by any centralized authority.
+### ⛓️ Blockchain-Native Integrity & Media Leak
+Every complaint and report is anchored on an immutable blockchain ledger. Once submitted, evidence cannot be tampered with, deleted, or hidden.
+- **15-Day Automatic Media Leak**: If a civic case is not resolved within the 15-day SLA, it is automatically escalated and leaked to public media channels, ensuring global pressure and accountability.
 - **On-Chain SLAs**: Automated tracking of government response times.
 - **Transparent Auditing**: A public record of all resolved and escalated cases.
 
