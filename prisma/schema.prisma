@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  role          String   @default("CITIZEN")
+  walletAddress String?  @unique
+  email         String   @unique
+  cases         Case[]   @relation("CreatorCases")
+  createdAt     DateTime @default(now())
+}
+
+model Case {
+  id              String   @id @default(uuid())
+  title           String
+  description     String
+  cid             String
+  fileHash        String
+  status          String   @default("SUBMITTED")
+  assignedTo      String?
+  slaDeadline     DateTime
+  blockchainId    Int?     @unique
+  transactionHash String?
+  encryptionKey   String?
+  creatorId       String
+  creator         User     @relation("CreatorCases", fields: [creatorId], references: [id])
+  createdAt       DateTime @default(now())
+}

@@ -1,0 +1,561 @@
+================================================================================
+         NyayaSetu - Complete Setup & Startup Guide
+================================================================================
+
+This guide walks you through the COMPLETE setup process from scratch,
+including MetaMask, blockchain, database, and all three application components.
+
+
+================================================================================
+  TABLE OF CONTENTS
+================================================================================
+
+  1. Prerequisites (Install These First)
+  2. MetaMask Wallet Setup
+  3. Clone & Install Dependencies
+  4. Database Setup (PostgreSQL via Neon)
+  5. Blockchain Setup (Hardhat Local Node)
+  6. Deploy Smart Contracts
+  7. Connect MetaMask to Local Blockchain
+  8. Import Test Accounts into MetaMask
+  9. Configure Environment Variables
+  10. Start the Main Application (NyayaSetu)
+  11. Start the Admin Panel
+  12. Verify Everything is Working
+  13. Quick-Start Commands (TL;DR)
+  14. Troubleshooting
+
+
+================================================================================
+  1. PREREQUISITES (Install These First)
+================================================================================
+
+Before you begin, make sure you have the following installed:
+
+  a) Node.js (v18 or later)
+     - Download: https://nodejs.org/
+     - Verify:   node --version
+                  npm --version
+
+  b) Git
+     - Download: https://git-scm.com/
+     - Verify:   git --version
+
+  c) MetaMask Browser Extension
+     - Download: https://metamask.io/download/
+     - Supported browsers: Chrome, Firefox, Brave, Edge
+
+  d) A code editor (recommended: VS Code)
+     - Download: https://code.visualstudio.com/
+
+
+================================================================================
+  2. METAMASK WALLET SETUP
+================================================================================
+
+If you already have MetaMask installed, skip to step 2c.
+
+  a) Install MetaMask:
+     - Go to https://metamask.io/download/
+     - Click "Install MetaMask for [your browser]"
+     - Add the extension to your browser
+
+  b) Create a new wallet:
+     - Click "Create a new wallet"
+     - Set a strong password
+     - IMPORTANT: Write down your Secret Recovery Phrase (12 words)
+       and store it safely. NEVER share this with anyone.
+     - Confirm the recovery phrase
+
+  c) MetaMask is now ready. We will configure the network in Step 7
+     after the blockchain node is running.
+
+
+================================================================================
+  3. CLONE & INSTALL DEPENDENCIES
+================================================================================
+
+  a) Clone the repository (if you haven't already):
+
+     git clone <your-repository-url>
+     cd NyayaSetu
+
+  b) Install dependencies for the MAIN APP (root folder):
+
+     npm install
+
+  c) Install dependencies for the BLOCKCHAIN:
+
+     cd blockchain
+     npm install
+     cd ..
+
+  d) Install dependencies for the ADMIN PANEL:
+
+     cd NyayaSetu-admin-master
+     npm install
+     cd ..
+
+  e) Generate the Prisma client:
+
+     npx prisma generate
+
+
+================================================================================
+  4. DATABASE SETUP (PostgreSQL via Neon)
+================================================================================
+
+The project uses PostgreSQL hosted on Neon (serverless Postgres).
+
+  a) Create a Neon account:
+     - Go to https://neon.tech/
+     - Sign up for a free account
+
+  b) Create a new project:
+     - Click "New Project"
+     - Choose a region close to you (e.g., ap-southeast-1)
+     - Copy the connection string provided
+
+  c) Update the DATABASE_URL in your .env file:
+     Open the file:  NyayaSetu/.env
+     Find this line:
+
+       DATABASE_URL="postgresql://..."
+
+     Replace it with YOUR Neon connection string. The format is:
+
+       DATABASE_URL="postgresql://<user>:<password>@<host>/<database>?sslmode=require&pgbouncer=true&connect_timeout=15"
+
+  d) Push the database schema:
+
+     npx prisma db push
+
+     This creates all the required tables (User, Case) in your database.
+
+  e) (Optional) Open Prisma Studio to view your database:
+
+     npx prisma studio
+
+     This opens a visual database browser at http://localhost:5555
+
+
+================================================================================
+  5. BLOCKCHAIN SETUP (Hardhat Local Node)
+================================================================================
+
+The project runs a LOCAL Ethereum blockchain using Hardhat.
+
+  a) Open a NEW terminal window (keep it open - this runs continuously):
+
+     cd blockchain
+     npx hardhat node
+
+  b) You should see output like this:
+
+     Started HTTP and WebSocket JSON-RPC server at http://127.0.0.1:8545/
+
+     Account #0: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 (10000 ETH)
+     Private Key: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+
+     Account #1: 0x70997970C51812dc3A010C7d01b50e0d17dc79C8 (10000 ETH)
+     Private Key: 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+
+     ... (20 test accounts total)
+
+  c) IMPORTANT: Keep this terminal OPEN. The blockchain stops if you close it.
+     Every time you restart the node, you must re-deploy contracts (Step 6).
+
+
+================================================================================
+  6. DEPLOY SMART CONTRACTS
+================================================================================
+
+In a SECOND terminal window (keep the Hardhat node running in the first):
+
+  a) Compile the smart contracts:
+
+     cd blockchain
+     npx hardhat compile
+
+  b) Deploy all contracts to the local blockchain:
+
+     npx hardhat run scripts/deploy.cjs --network localhost
+
+  c) You should see output like:
+
+     ✅ ShadowVault deployed to:         0x...
+     ✅ WhistleblowerPortal deployed to:  0x...
+     ✅ CivicChainRegistry deployed to:   0x...
+
+  d) The deploy script automatically:
+     - Saves addresses to  blockchain/deployed-addresses.json
+     - Saves addresses to  deployed-addresses.json  (project root)
+     - Creates/updates     .env.local  with contract addresses
+
+  e) (Optional) Deploy the DeadManSwitch contract:
+
+     npx hardhat run scripts/deploy-deadman.cjs --network localhost
+
+  f) (Optional) Register a test agency for the Agency Portal:
+
+     npx hardhat run scripts/register-test-agency.cjs --network localhost
+
+  g) (Optional) Seed sample cases for testing:
+
+     npx hardhat run scripts/seed-cases.cjs --network localhost
+
+
+================================================================================
+  7. CONNECT METAMASK TO LOCAL BLOCKCHAIN
+================================================================================
+
+Now connect MetaMask to your local Hardhat node:
+
+  a) Open MetaMask in your browser
+
+  b) Click the network dropdown (top-left, usually says "Ethereum Mainnet")
+
+  c) Click "Add network" -> "Add a network manually"
+
+  d) Enter these details:
+
+       Network Name:        Localhost 8545
+       New RPC URL:         http://127.0.0.1:8545
+       Chain ID:            1337
+       Currency Symbol:     ETH
+       Block Explorer URL:  (leave blank)
+
+  e) Click "Save"
+
+  f) Make sure "Localhost 8545" is selected as your active network
+
+
+================================================================================
+  8. IMPORT TEST ACCOUNTS INTO METAMASK
+================================================================================
+
+Hardhat provides pre-funded test accounts. Import at least Account #0
+(the deployer/admin account):
+
+  a) In MetaMask, click your account icon (top-right)
+  b) Click "Import Account"
+  c) Select "Private Key"
+  d) Paste this private key for Account #0 (deployer/admin):
+
+     0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+
+     Address: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+     Balance: 10,000 ETH (test ETH, no real value)
+
+  e) Click "Import"
+
+  f) (Optional) Import more test accounts for testing different roles:
+
+     Account #1 (for testing as a citizen):
+     Private Key: 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+     Address:     0x70997970C51812dc3A010C7d01b50e0d17dc79C8
+
+     Account #2 (for testing as an agency):
+     Private Key: 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+     Address:     0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC
+
+  g) IMPORTANT: These are TEST accounts only. NEVER use these private keys
+     on a real network — they are publicly known.
+
+  h) IMPORTANT: Every time you restart the Hardhat node and redeploy,
+     you should RESET MetaMask account activity:
+       MetaMask -> Settings -> Advanced -> Clear activity tab data
+     This avoids "nonce too high" errors.
+
+
+================================================================================
+  9. CONFIGURE ENVIRONMENT VARIABLES
+================================================================================
+
+  a) The deploy script (Step 6) auto-generates .env.local with contract
+     addresses. Verify the file exists at:  NyayaSetu/.env.local
+
+  b) Check/update the main .env file at: NyayaSetu/.env
+
+     Required variables:
+
+       # Pinata (IPFS) - For file uploads
+       PINATA_JWT="your_pinata_jwt_here"
+       NEXT_PUBLIC_PINATA_GATEWAY="your_gateway.mypinata.cloud"
+
+       # Database (Neon PostgreSQL)
+       DATABASE_URL="postgresql://..."
+
+       # Contract Addresses (auto-set by deploy script)
+       NEXT_PUBLIC_PORTAL_ADDRESS=0x...
+       NEXT_PUBLIC_VAULT_ADDRESS=0x...
+       NEXT_PUBLIC_REGISTRY_ADDRESS=0x...
+
+       # Network
+       NEXT_PUBLIC_CHAIN_ID=1337
+       NEXT_PUBLIC_NETWORK_NAME=localhost
+       NEXT_PUBLIC_RPC_URL=http://127.0.0.1:8545
+
+  c) To get a Pinata JWT (for IPFS file uploads):
+     - Sign up at https://www.pinata.cloud/
+     - Go to API Keys -> New Key
+     - Create a key with "pinFileToIPFS" and "pinJSONToIPFS" permissions
+     - Copy the JWT token into your .env file
+     - Set your gateway URL (found in Pinata dashboard under Gateways)
+
+
+================================================================================
+  10. START THE MAIN APPLICATION (NyayaSetu)
+================================================================================
+
+In a NEW terminal window (3rd terminal):
+
+  a) Make sure you are in the project root:
+
+     cd NyayaSetu
+
+  b) Start the development server:
+
+     npm run dev
+
+  c) The app will start on:
+
+     http://localhost:3000
+
+  d) Features available:
+     - Homepage with platform overview
+     - Submit civic complaints (public, on-chain)
+     - Anonymous whistleblowing (with IPFS)
+     - ZK-Mixer (ShadowVault) for anonymous transactions
+     - Public ledger to view all cases
+     - Agency portal for authorized agencies
+     - Dead Man's Switch for scheduled evidence release
+     - Evidence verification tool
+
+
+================================================================================
+  11. START THE ADMIN PANEL
+================================================================================
+
+In a NEW terminal window (4th terminal):
+
+  a) Navigate to the admin panel:
+
+     cd NyayaSetu/NyayaSetu-admin-master
+
+  b) Start the admin dev server on a different port:
+
+     npm run dev -- -p 3001
+
+  c) The admin panel will start on:
+
+     http://localhost:3001
+
+  d) Admin features:
+     - Dashboard with case statistics
+     - View and manage all cases
+     - Case detail pages with status updates
+     - Agency management (authorize/revoke agencies)
+     - Escalated cases tracking
+     - Network status monitoring
+     - Settings page
+
+  e) NOTE: The admin panel connects to the same local blockchain.
+     Make sure the Hardhat node is running and contracts are deployed.
+
+
+================================================================================
+  12. VERIFY EVERYTHING IS WORKING
+================================================================================
+
+Checklist — make sure all of these are running:
+
+  [ ] Terminal 1:  Hardhat node running        (http://127.0.0.1:8545)
+  [ ] Terminal 2:  Contracts deployed           (deploy.cjs ran successfully)
+  [ ] Terminal 3:  Main app running             (http://localhost:3000)
+  [ ] Terminal 4:  Admin panel running          (http://localhost:3001)
+  [ ] MetaMask:    Connected to Localhost 8545  (Chain ID: 1337)
+  [ ] MetaMask:    Test account imported        (Account #0)
+
+Quick test:
+  1. Open http://localhost:3000
+  2. Click "Connect Wallet" — MetaMask should pop up
+  3. Approve the connection
+  4. Try submitting a test complaint
+  5. Open http://localhost:3001 to see it in the admin panel
+
+
+================================================================================
+  13. QUICK-START COMMANDS (TL;DR)
+================================================================================
+
+If everything is already installed and configured, here's the fast way:
+
+  --- Terminal 1: Start blockchain ---
+  cd NyayaSetu/blockchain
+  npx hardhat node
+
+  --- Terminal 2: Deploy contracts ---
+  cd NyayaSetu/blockchain
+  npx hardhat compile
+  npx hardhat run scripts/deploy.cjs --network localhost
+
+  --- Terminal 3: Start main app ---
+  cd NyayaSetu
+  npm run dev
+
+  --- Terminal 4: Start admin panel ---
+  cd NyayaSetu/NyayaSetu-admin-master
+  npm run dev -- -p 3001
+
+  Then open:
+    Main App:    http://localhost:3000
+    Admin Panel: http://localhost:3001
+
+
+================================================================================
+  14. TROUBLESHOOTING
+================================================================================
+
+  PROBLEM: "Cannot find module 'hardhat'"
+  FIX:     cd blockchain && npm install
+
+  PROBLEM: "Cannot find module '@nomicfoundation/hardhat-toolbox'"
+  FIX:     cd blockchain && npm install --save-dev @nomicfoundation/hardhat-toolbox
+
+  PROBLEM: "Error: Network localhost not found"
+  FIX:     Make sure Hardhat node is running (npx hardhat node)
+
+  PROBLEM: MetaMask shows "Nonce too high" error
+  FIX:     MetaMask -> Settings -> Advanced -> Clear activity tab data
+
+  PROBLEM: MetaMask not connecting to localhost
+  FIX:     - Verify Hardhat node is running on http://127.0.0.1:8545
+           - Check MetaMask network settings (Chain ID must be 1337)
+           - Try removing and re-adding the network in MetaMask
+
+  PROBLEM: "Contract not deployed" errors in the app
+  FIX:     - Redeploy contracts: cd blockchain && npx hardhat run scripts/deploy.cjs --network localhost
+           - Check that .env.local has the correct contract addresses
+           - Restart the Next.js dev server after .env changes
+
+  PROBLEM: Prisma / Database errors
+  FIX:     - Run: npx prisma generate
+           - Run: npx prisma db push
+           - Check DATABASE_URL in .env
+
+  PROBLEM: IPFS upload failing
+  FIX:     - Verify PINATA_JWT is set correctly in .env
+           - Check your Pinata API key permissions
+           - Make sure your Pinata account is active
+
+  PROBLEM: Compilation errors in blockchain
+  FIX:     cd blockchain && npx hardhat clean && npx hardhat compile
+
+  PROBLEM: Admin panel can't read blockchain data
+  FIX:     - Ensure Hardhat node is running
+           - Contracts must be deployed to localhost
+           - Admin panel uses the same RPC URL (http://127.0.0.1:8545)
+
+  PROBLEM: npm install fails
+  FIX:     - Delete node_modules and package-lock.json, then run npm install again
+           - Make sure you have Node.js v18+
+
+
+================================================================================
+  PROJECT STRUCTURE OVERVIEW
+================================================================================
+
+  NyayaSetu/
+  ├── .env                         # Main environment variables
+  ├── .env.local                   # Contract addresses (auto-generated)
+  ├── package.json                 # Main app dependencies
+  ├── next.config.ts               # Next.js configuration
+  ├── prisma/
+  │   └── schema.prisma            # Database schema (User, Case models)
+  ├── src/
+  │   ├── app/                     # Next.js app routes
+  │   │   ├── page.tsx             # Homepage
+  │   │   ├── layout.tsx           # Root layout with Web3Provider
+  │   │   ├── submit/              # Submit complaint page
+  │   │   ├── ledger/              # Public ledger
+  │   │   ├── privacy/             # Anonymous whistleblowing
+  │   │   ├── agency/              # Agency portal
+  │   │   ├── deadman/             # Dead Man's Switch
+  │   │   └── api/                 # API routes (decrypt, IPFS, verify)
+  │   ├── components/              # React components
+  │   │   ├── Navbar.tsx           # Navigation bar
+  │   │   ├── CaseReport.tsx       # Case report component
+  │   │   ├── MixerComponent.tsx   # ZK-Mixer UI
+  │   │   ├── HeroSection.tsx      # Landing page hero
+  │   │   ├── providers/           # Web3Provider wrapper
+  │   │   └── wallet/              # Wallet connection UI
+  │   ├── contracts/               # ABI JSONs + address config
+  │   ├── hooks/                   # Custom React hooks
+  │   │   ├── useCivicChainRegistry.ts
+  │   │   ├── useShadowVault.ts
+  │   │   ├── useDeadManSwitch.ts
+  │   │   └── useAgencyAuth.ts
+  │   └── lib/                     # Utilities (crypto, web3, db)
+  │       ├── web3-config.ts       # Wagmi + MetaMask config
+  │       └── db.ts                # Prisma client
+  │
+  ├── blockchain/                  # Smart contracts (Hardhat)
+  │   ├── contracts/
+  │   │   ├── CivicChainRegistry.sol   # Public complaint registry
+  │   │   ├── WhistleblowerPortal.sol   # Anonymous whistleblowing
+  │   │   ├── ShadowVault.sol          # ZK-Mixer for anonymity
+  │   │   ├── DeadManSwitch.sol        # Scheduled evidence release
+  │   │   └── Groth16Verifier.sol      # ZK-proof verifier
+  │   ├── scripts/
+  │   │   ├── deploy.cjs               # Main deployment script
+  │   │   ├── deploy-deadman.cjs       # DeadManSwitch deployment
+  │   │   ├── register-test-agency.cjs # Register test agency
+  │   │   └── seed-cases.cjs           # Seed sample data
+  │   ├── hardhat.config.js            # Hardhat configuration
+  │   └── package.json
+  │
+  └── NyayaSetu-admin-master/      # Admin Panel (separate Next.js app)
+      ├── src/app/
+      │   ├── page.tsx             # Admin dashboard
+      │   ├── cases/               # Case management
+      │   ├── agencies/            # Agency management
+      │   ├── escalated/           # Escalated cases
+      │   ├── resolved/            # Resolved cases
+      │   ├── network/             # Network status
+      │   └── settings/            # Admin settings
+      └── package.json
+
+
+================================================================================
+  SMART CONTRACTS SUMMARY
+================================================================================
+
+  1. CivicChainRegistry.sol  — Public civic complaints with 15-day SLA tracking
+  2. WhistleblowerPortal.sol  — Anonymous whistleblowing with DAO verification
+  3. ShadowVault.sol          — ZK-Mixer for breaking transaction links
+  4. DeadManSwitch.sol        — Scheduled evidence release mechanism
+  5. Groth16Verifier.sol      — ZK-SNARK proof verifier
+
+  All contracts deploy to local Hardhat network:
+    - RPC URL:   http://127.0.0.1:8545
+    - Chain ID:  1337
+
+
+================================================================================
+  PORTS SUMMARY
+================================================================================
+
+  Service               Port       URL
+  ─────────────────────────────────────────────────────
+  Hardhat Node           8545      http://127.0.0.1:8545
+  Main App (NyayaSetu)   3000      http://localhost:3000
+  Admin Panel            3001      http://localhost:3001
+  Prisma Studio          5555      http://localhost:5555 (optional)
+
+
+================================================================================
+
+  Happy Building! 🚀
+
+================================================================================

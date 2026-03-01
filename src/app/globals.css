@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter);
+  --color-brand-primary: #2563EB;     /* Government Blue */
+  --color-brand-secondary: #1E40AF;   /* Darker Blue */
+  --color-brand-accent: #16A34A;      /* Success Green */
+  --color-bg-page: #F8FAFC;          /* Clean Slate Background */
+  --color-text-main: #0F172A;        /* Deep Slate Text */
+  --color-text-muted: #64748B;       /* Gray-ish Text */
+  --color-border-subtle: #E2E8F0;    /* Light Borders */
+}
+
+@layer base {
+  body {
+    background-color: var(--color-bg-page);
+    color: var(--color-text-main);
+    @apply antialiased;
+  }
+}
+
+::selection {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: #1E40AF;
+}
+
+/* Formal UI Classes */
+.document-card {
+  @apply bg-white border border-border-subtle rounded-2xl shadow-sm hover:shadow-md transition-all duration-300;
+}
+
+.hero-gradient {
+  background: radial-gradient(circle at top right, rgba(37, 99, 235, 0.05), transparent 40%),
+              radial-gradient(circle at bottom left, rgba(22, 163, 74, 0.03), transparent 30%);
+}
+
+.glow-blur {
+  @apply opacity-20;
+  filter: blur(120px);
+}
+
+.glow-blur-sm {
+  @apply opacity-10;
+  filter: blur(40px);
+}
