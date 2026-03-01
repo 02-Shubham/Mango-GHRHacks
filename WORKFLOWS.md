@@ -11,7 +11,7 @@ For issues like infrastructure damage, public service failures, or general civic
 3. **Fill Form**: Provide the department (e.g., "Roads", "Water"), a clear description, and upload any photo/video evidence.
 4. **On-Chain Submission**: Confirm the transaction in MetaMask. Your complaint is now recorded on the `CivicChainRegistry`.
 5. **Track Status**: Visit the "Public Ledger" to see your case and its current status (Submitted, Assigned, In Progress).
-6. **Automatic Escalation**: If the agency doesn't resolve the case within 15 days, any user can trigger an "Escalation to Public" via the ledger UI.
+6. **Automatic Media Leak**: If the agency doesn't resolve the case within 15 days, any user can trigger an "Automatic Media Leak" via the ledger UI, exposing the issue to reporters and the general public.
 
 ---
 

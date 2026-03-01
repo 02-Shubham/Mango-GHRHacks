@@ -70,9 +70,9 @@ sequenceDiagram
         A->>R: updateStatus(caseId, Resolved)
         R->>P: Status Update: Resolved
     else SLA Deadline Passes
-        C->>R: triggerEscalation(caseId)
-        R->>R: Status: EscalatedToPublic
-        R->>P: Status Updated: Ecalated (Public Shame/Attention)
+        C->>R: triggerEscalation(caseId) [Trigger Media Leak]
+        R->>R: Status: EscalatedToMedia
+        R->>P: Status Updated: LEAKED_TO_MEDIA
     end
 ```
 
