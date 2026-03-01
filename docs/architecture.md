@@ -100,3 +100,14 @@ By combining **IPFS** for decentralized storage and **AI** for metadata scrubbin
 - **In-Browser Proof Generation**: ZK-Proofs are computed locally on the user's device. No secrets ever leave the machine.
 - **Asymmetric Key Integration**: The `DeadManSwitch` uses a dual-key model (stored encrypted, released as plaintext) to ensure evidence safety.
 - **Role-Based On-Chain Access**: Only agency addresses added by the admin can update case statuses, preventing unauthorized manipulation of the record.
+---
+
+## 🛠️ ZK Circuit Setup (ShadowVault)
+
+To enable full cryptographic verification in the `ShadowVault`, the following files must be generated and placed in the `public/circuits/` directory:
+
+- `withdraw.wasm`: The compiled Circom circuit.
+- `circuit_final.zkey`: The Groth16 proving key.
+- `verification_key.json`: The verification key for on-chain verification.
+
+These can be generated using the setup script located at `blockchain/scripts/setup-circuits.cjs`. Note that until these files are present, the application operates in **DEV_MODE**, where the `Groth16Verifier` contract skips proof validation for easier local testing.

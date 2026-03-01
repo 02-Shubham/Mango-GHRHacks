@@ -62,6 +62,31 @@ An automated mechanism to release sensitive evidence if a whistleblower is compr
 - `SwitchRegistered`: Emitted when a new dead man's switch is created.
 - `KeyReleased`: Emitted when the evidence decryption key becomes public on-chain.
 
+## 🔐 Security Architecture
+
+### WhistleblowerPortal
+- **Client-Side IDs**: Case IDs are generated client-side to prevent on-chain links to the reporter.
+- **Off-Chain Storage**: Only IPFS CIDs are stored on-chain; encrypted data remains off-chain.
+- **Council Governance**: Council members are set at deployment (3 votes required for verification).
+
+### ShadowVault
+- **Fixed Denominations**: 0.1 ETH deposits break amount-based tracking.
+- **Nullifiers**: Prevents double-spending of the same deposit.
+- **ZK-Proof Verification**: (Demo Note) ZK-proof verification is simplified for the demo; production requires full Merkle tree and Groth16 circuit integration.
+
+### CivicChainRegistry
+- **SLA Enforcement**: 15-day deadline is enforced by the contract state.
+- **RBAC**: Only authorized agency addresses can update case statuses.
+
+---
+
+## 📊 Gas Optimization & Strategy
+
+The contracts are optimized for Layer 2 environments:
+- **Calldata Usage**: Strings and bytes use `calldata` where possible to minimize entry gas.
+- **Minimal Storage**: We prioritize events for off-chain indexing and minimize persistent storage slots.
+- **Future-Proofing**: The architecture is designed to eventually support ERC-1167 proxy patterns for department-specific registries.
+
 ---
 
 ## 5. `Groth16Verifier.sol`
